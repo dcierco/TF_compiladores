@@ -1,3 +1,5 @@
 *.vscode
 *.class
 Yylex.java
+Parser.java
+*.output
