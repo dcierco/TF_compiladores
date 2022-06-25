@@ -29,12 +29,20 @@ NL  = \n | \r | \r\n
 "(" | 
 ")" |
 "<" |
+">" |
 "="   { return (int) yycharat(0); }
+
+"==" { return Parser.EQUAL; }
+">=" { return Parser.LESSEQ; }
+"<=" { return Parser.HIGHEQ; }
+"!=" { return Parser.NOTEQUAL; }
+
  
 if  { return Parser.IF; }
 else  { return Parser.ELSE; }
 while  { return Parser.WHILE; }
 print  { return Parser.PRINT; }
+define { return Parser.DEFINE; }
 
 
 {NL}   { return Parser.NL; }

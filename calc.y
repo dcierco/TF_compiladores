@@ -4,6 +4,7 @@
   import java.util.HashMap;
 %}
       
+%token DEFINE
 %token NL          /* newline  */
 %token <dval> NUM  /* a number */
 %token IF, WHILE, ELSE, PRINT
@@ -11,7 +12,7 @@
 
 %type <obj> exp, cmd, line, input, lcmd
 
-%nonassoc '<'
+%nonassoc '<', '>', EQUAL, LESSEQ, HIGHEQ, NOTEQUAL
 %left '-' '+'
 %left '*', '/'
 %left NEG          /* negation--unary minus */
@@ -42,6 +43,7 @@ cmd :  IDENT '=' exp ';'            { $$ = new NodoNT(TipoOperacao.ATRIB, $1, (I
     |  IF '(' exp ')' cmd           { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
     |  IF '(' exp ')' cmd ELSE cmd  { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
     |  WHILE '(' exp ')' cmd       { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
+    |  FOR '(' cmd ',' exp ',' exp ')'       { $$ = new NodoNT(TipoOperacao.FOR,(INodo)$3, (INodo)$5, null); }
     | '{' lcmd '}'                 { $$ = $2; }
     ;
       
@@ -57,6 +59,11 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
        | exp '*' exp        { $$ = new NodoNT(TipoOperacao.MULL,(INodo)$1,(INodo)$3); }
        | exp '/' exp        { $$ = new NodoNT(TipoOperacao.DIV,(INodo)$1,(INodo)$3); }
        | exp '<' exp        { $$ = new NodoNT(TipoOperacao.LESS,(INodo)$1,(INodo)$3); }
+       | exp '>' exp        { $$ = new NodoNT(TipoOperacao.HIGHER,(INodo)$1,(INodo)$3); }
+       | exp LESSEQ exp        { $$ = new NodoNT(TipoOperacao.LESSEQ,(INodo)$1,(INodo)$3); }
+       | exp HIGHEQ exp        { $$ = new NodoNT(TipoOperacao.HIGHEQ,(INodo)$1,(INodo)$3); }
+       | exp EQUAL exp        { $$ = new NodoNT(TipoOperacao.EQUAL,(INodo)$1,(INodo)$3); }
+       | exp NOTEQUAL exp        { $$ = new NodoNT(TipoOperacao.NOTEQUAL,(INodo)$1,(INodo)$3); }
        | '-' exp  %prec NEG { $$ = new NodoNT(TipoOperacao.UMINUS,(INodo)$2,null); }
        | exp '^' exp        { $$ = new NodoNT(TipoOperacao.POW,(INodo)$1,(INodo)$3); }
        | '(' exp ')'        { $$ = $2; }

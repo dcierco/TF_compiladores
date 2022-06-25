@@ -3,9 +3,10 @@ import java.util.HashMap;
 
 public class NodoNT implements INodo
 {
-     private TipoOperacao op;
+    private TipoOperacao op;
     private INodo subE, subD;
     private INodo expr;
+    private INodo incr;
     private String ident;
 
     public NodoNT(TipoOperacao op, INodo se, INodo sd) {
@@ -24,6 +25,14 @@ public class NodoNT implements INodo
         this.op = op;
         subE = caseT;
         subD = caseF;
+        expr = exp;
+    }
+
+    public NodoNT(TipoOperacao op, INodo atrib, INodo compar, INodo incr, INodo exp ) {
+        this.op = op;
+        subE = atrib;
+        subD = compar;
+        this.incr = incr;
         expr = exp;
     }
    
@@ -56,6 +65,9 @@ public class NodoNT implements INodo
         else if (op == TipoOperacao.WHILE) {
             result = new ResultValue(-1.0);
         }
+        else if (op == TipoOperacao.FOR) {
+            result = new ResultValue(-1.0);
+        }
        else if (op == TipoOperacao.SEQ) {
             result = new ResultValue(-1.0);
         }
@@ -80,7 +92,18 @@ public class NodoNT implements INodo
               break;
             case LESS:
               result = new ResultValue(left.getDouble() < right.getDouble());
-              break;                    
+              break; 
+            case HIGHER:
+              result = new ResultValue(left.getDouble() > right.getDouble());
+              break;
+            case LESSEQ:
+              result = new ResultValue(left.getDouble() <= right.getDouble());
+            case HIGHEQ:
+              result = new ResultValue(left.getDouble() >= right.getDouble());
+            case EQUAL:
+              result = new ResultValue(left.getDouble() == right.getDouble());
+            case NOTEQUAL:
+              result = new ResultValue(left.getDouble() != right.getDouble());
             default:
               result = new ResultValue(0);
             }
@@ -97,6 +120,8 @@ public class NodoNT implements INodo
             result = "if (" + expr + ")" + subE + " else " + subD  ;
         else if (op == TipoOperacao.WHILE) 
             result = "while (" + subE + ")" + subD   ;
+        else if (op == TipoOperacao.FOR) 
+            result = "for (" + subE + ", " + subD + ", " + incr + ")" + expr   ;
         else if (op == TipoOperacao.UMINUS) 
             result = "-" + subE  ;
         else {
@@ -120,6 +145,21 @@ public class NodoNT implements INodo
 
                  case LESS:
                     opBin = " < ";
+                    break;
+                 case HIGHER:
+                    opBin = " > ";
+                    break;
+                 case LESSEQ:
+                    opBin = " <= ";
+                    break;
+                 case HIGHEQ:
+                    opBin = " >= ";
+                    break;
+                case EQUAL:
+                    opBin = " == ";
+                    break;
+                case NOTEQUAL:
+                    opBin = " != ";
                     break;
 
                  default:
