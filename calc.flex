@@ -33,8 +33,8 @@ NL  = \n | \r | \r\n
 "="   { return (int) yycharat(0); }
 
 "==" { return Parser.EQUAL; }
-">=" { return Parser.LESSEQ; }
-"<=" { return Parser.HIGHEQ; }
+">=" { return Parser.HIGHEQ; }
+"<=" { return Parser.LESSEQ; }
 "!=" { return Parser.NOTEQUAL; }
 
  

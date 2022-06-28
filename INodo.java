@@ -8,6 +8,5 @@
 
 public interface INodo
 {
- 
     public ResultValue avalia();
 }

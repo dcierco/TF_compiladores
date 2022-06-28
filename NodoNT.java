@@ -50,23 +50,35 @@ public class NodoNT implements INodo
         else if (op == TipoOperacao.ATRIB) {
              result = subE.avalia();
              Parser.memory.put(ident, result);    
-             //System.out.printf("sube: %s, %s <- %f\n", subE, ident, result.getDouble());         
+             System.out.printf("sube: %s, %s <- %f\n", subE, ident, result.getDouble());         
         }
 
        else if (op == TipoOperacao.IF) {
-             result = new ResultValue(-1.0);
-  
+            if(expr.avalia().getBool()){
+              result = new ResultValue(subE.avalia().getDouble());
+            }
+            else{
+              return null;
+            }
       }
-
         else if (op == TipoOperacao.IFELSE) {
-             result = new ResultValue(-1.0);
+          if(expr.avalia().getBool() == true){
+            result = new ResultValue(subE.avalia().getDouble());
+          }
+          else{
+            result = new ResultValue(subD.avalia().getDouble());
+          }
         }
 
         else if (op == TipoOperacao.WHILE) {
-            result = new ResultValue(-1.0);
+            while (expr.avalia().getBool()) {
+              subD.avalia();
+            }
         }
         else if (op == TipoOperacao.FOR) {
-            result = new ResultValue(-1.0);
+            for (subE.avalia(); subD.avalia().getBool(); incr.avalia()) {
+              result = new ResultValue(expr.avalia().getDouble());
+            }
         }
        else if (op == TipoOperacao.SEQ) {
             result = new ResultValue(-1.0);
