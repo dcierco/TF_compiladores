@@ -39,7 +39,7 @@ public class NodoNT implements INodo
     public ResultValue avalia() {
 
         ResultValue result = null;
-        ResultValue  left, right, expressao;
+        ResultValue  left, right;
         
         if (op == TipoOperacao.NULL)
            return null; 
@@ -58,7 +58,7 @@ public class NodoNT implements INodo
               result = new ResultValue(subE.avalia().getDouble());
             }
             else{
-              return null;
+              return result = new ResultValue(false);
             }
       }
         else if (op == TipoOperacao.IFELSE) {
@@ -81,7 +81,8 @@ public class NodoNT implements INodo
             }
         }
        else if (op == TipoOperacao.SEQ) {
-            result = new ResultValue(-1.0);
+            subE.avalia();
+            result = new ResultValue(subD.avalia().getDouble());
         }
         else {        
             left = subE.avalia();
@@ -110,14 +111,19 @@ public class NodoNT implements INodo
               break;
             case LESSEQ:
               result = new ResultValue(left.getDouble() <= right.getDouble());
+              break;
             case HIGHEQ:
               result = new ResultValue(left.getDouble() >= right.getDouble());
+              break;
             case EQUAL:
               result = new ResultValue(left.getDouble() == right.getDouble());
+              break;
             case NOTEQUAL:
               result = new ResultValue(left.getDouble() != right.getDouble());
+              break;
             default:
               result = new ResultValue(0);
+              break;
             }
         }
         

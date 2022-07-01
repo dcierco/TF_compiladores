@@ -19,5 +19,5 @@ public enum TipoOperacao
     FOR,
     DEFINE,
     SEQ, 
-    NULL
+    NULL;
 }

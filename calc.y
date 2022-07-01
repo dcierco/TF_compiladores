@@ -2,20 +2,24 @@
 %{
   import java.io.*;
   import java.util.HashMap;
+  import java.util.List;
+  import java.util.ArrayList;
+
 %}
+
       
 %token DEFINE
 %token NL          /* newline  */
 %token <dval> NUM  /* a number */
-%token IF, WHILE, ELSE, PRINT
+%token IF, WHILE, ELSE, PRINT, FOR
 %token <sval> IDENT
 
-%type <obj> exp, cmd, line, input, lcmd
+%type <obj> exp, cmd, line, input, lcmd, args, execArgs
 
-%nonassoc '<', '>', EQUAL, LESSEQ, HIGHEQ, NOTEQUAL
+%nonassoc '<', '>', EQUAL, LESSEQ, HIGHEQ, NOTEQUAL   
 %left '-' '+'
 %left '*', '/'
-%left NEG          /* negation--unary minus */
+%left NEG, OR, AND          /* negation--unary minus */
 %right '^'         /* exponentiation        */
       
 %%
@@ -38,19 +42,31 @@ line:    NL      { if (interactive) System.out.print("\n> "); $$ = null; }
 		   System.out.println("\n= " + $1); 
                    if (interactive) System.out.print("\n>: "); }
        | cmd NL
+       
 
 cmd :  IDENT '=' exp ';'            { $$ = new NodoNT(TipoOperacao.ATRIB, $1, (INodo)$3); }
     |  IF '(' exp ')' cmd           { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
     |  IF '(' exp ')' cmd ELSE cmd  { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
     |  WHILE '(' exp ')' cmd       { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
-    |  FOR '(' cmd ',' exp ',' exp ')'       { $$ = new NodoNT(TipoOperacao.FOR,(INodo)$3, (INodo)$5, null); }
+    |  FOR '(' cmd exp ';' exp ')' cmd      { $$ = new NodoNT(TipoOperacao.FOR,(INodo)$3, (INodo)$4, (INodo)$6, (INodo)$8); }
     | '{' lcmd '}'                 { $$ = $2; }
+    |  DEFINE IDENT '(' args ')' cmd {$$ = $2; ListaFuncao.addFuncao(new Funcao($2)); ListaFuncao.busca($2).addParam($4.toString());ListaFuncao.busca($2).addCMD((INodo)$6);}
+    |  IDENT '(' execArgs ')' ';' { List<INodo> execParams = new ArrayList<INodo>(); execParams.add((INodo)$3); ListaFuncao.busca($1).executaFuncao(execParams);}
     ;
       
 lcmd : lcmd cmd                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(INodo)$2); }
      |                          { $$ = new NodoNT(TipoOperacao.NULL, null, null, null); }               
      ;
 
+args : IDENT args { $$ = new NodoID($1); }
+     | ',' args {}
+     |          {$$ = new NodoNT(TipoOperacao.NULL, null, null, null);}
+     ;
+
+execArgs : NUM execArgs {$$ = new NodoTDouble($1);}
+        | ',' execArgs
+        |               {$$ = new NodoNT(TipoOperacao.NULL, null, null, null);}
+        ;
 
 exp:     NUM                { $$ = new NodoTDouble($1); }
        | IDENT              { $$ = new NodoID($1); }
@@ -72,6 +88,7 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
 %%
 
   public static HashMap<String, ResultValue> memory = new HashMap<>();
+  private ListaFuncao lfunc = new ListaFuncao();
   private Yylex lexer;
 
 
